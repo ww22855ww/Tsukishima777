@@ -1,0 +1,124 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>撞到人了 怎麼辦</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+
+        .card {
+            transition: all 0.3s ease;
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            }
+
+        .reason-card {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+            .reason-card.show {
+                display: block;
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .pulse {
+            animation: pulse 0.5s;
+        }
+
+        .reason-highlight {
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">台灣肇責脫罪小幫手</h1>
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <button id="chooseButton" class="btn btn-primary btn-lg">產生藉口</button>
+            </div>
+        </div>
+        <div id="reasonContainer"></div>
+    </div>
+    <div class="text-center">
+        <h5><a href="index.html">點我 [歐虧 回去賭命]</a></h5>
+    </div>
+
+    <script>
+        const reasons = [
+            "天氣原因：天雨路滑或天氣惡劣導致視線不佳。",
+            "路況問題：道路施工、路面坑洞、不平等導致車輛失控。",
+            "煞車失靈：煞車系統出現故障，導致無法及時剎車。",
+            "其他車輛：被其他車輛影響，如被追尾或被切入車道。",
+            "視線盲區：有視線死角，未能及時發現前方障礙物。",
+            "駕駛分心：使用手機或其他車內操作分心，未能專心駕駛。",
+            "超速行駛：車速過快，無法及時剎車或避讓。",
+            "疲勞駕駛：長時間駕駛，導致注意力不集中。",
+            "道路標誌不清：道路標誌不清晰或被遮擋，未能及時反應。",
+            "突發情況：突然有動物或行人出現，來不及反應。"
+        ];
+
+        const chooseButton = document.getElementById('chooseButton');
+        const reasonContainer = document.getElementById('reasonContainer');
+
+        function highlightReason(reason) {
+            const [highlight, explanation] = reason.split('：');
+            return `<span class="reason-highlight">${highlight}</span>：${explanation}`;
+        }
+
+        chooseButton.addEventListener('click', () => {
+            const randomReason = reasons[Math.floor(Math.random() * reasons.length)];
+            const reasonCard = document.createElement('div');
+            reasonCard.className = 'card mb-3 reason-card';
+            reasonCard.innerHTML = `
+                    <div class="card-body">
+                        <p class="lead mb-0">${highlightReason(randomReason)}</p>
+                    </div>
+                `;
+
+            reasonContainer.innerHTML = '';
+            reasonContainer.appendChild(reasonCard);
+
+            setTimeout(() => {
+                reasonCard.classList.add('show');
+            }, 50);
+
+            chooseButton.classList.add('pulse');
+            setTimeout(() => {
+                chooseButton.classList.remove('pulse');
+            }, 500);
+        });
+    </script>
+</body>
+</html>
