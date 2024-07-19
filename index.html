@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>骰子擲骰遊戲</title>
+    <title>沒有實力 全是運氣</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -77,7 +78,11 @@
         }
     </style>
 </head>
+<!-- 引入Bootstrap JavaScript和相依的Popper.js -->
 <body>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <div class="container">
         <svg class="logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
             <!-- 背景 -->
@@ -97,7 +102,7 @@
             <circle cx="110" cy="140" r="5" fill="#000000" />
             <circle cx="130" cy="160" r="5" fill="#000000" />
         </svg>
-        <h1>骰子擲骰遊戲</h1>
+        <h1>運氣遊戲 全吃人品</h1>
         <button onclick="rollDice()" id="rollButton">擲骰子</button>
         <div class="dice-container">
             <svg id="dice1" class="dice" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -109,6 +114,7 @@
         </div>
         <p id="result"></p>
     </div>
+    
 
     <script>
         // JavaScript 代碼保持不變
@@ -144,7 +150,7 @@
             rollButton.disabled = true;
             dice1.classList.add("rolling");
             dice2.classList.add("rolling");
-            resultElement.innerHTML = "骰子正在滾動...";
+            resultElement.innerHTML = "命運齒輪正在轉動...";
 
             setTimeout(() => {
                 dice1.classList.remove("rolling");
@@ -158,13 +164,13 @@
                 createDiceSVG(diceValue1, "dice1");
                 createDiceSVG(diceValue2, "dice2");
 
-                let resultText = `你擲出了 ${diceValue1} 和 ${diceValue2}，總和為 ${total}。<br>`;
-                resultText += `成功門檻為 ${gate}。<br>`;
+                let resultText = `你擲出了[ ${diceValue1} 點]和 [ ${diceValue2} 點]，總和為[ ${total} 點]。<br>`;
+                resultText += `本次事件成功門檻需要 [ ${gate} 點]。<br>`;
 
                 if (total >= gate) {
-                    resultText += '<span style="color: green;">恭喜通過！</span>';
+                    resultText += '<span style="color: green;">恭喜你歐氣爆棚</span>';
                 } else {
-                    resultText += '<span style="color: red;">失敗。</span>';
+                    resultText += '<span style="color: red;">兄弟 勸你明天再想吧。</span> </br> <div> <a href = "tarot.html">點我 算塔羅改運</a></div>';
                 }
 
                 resultElement.innerHTML = resultText;

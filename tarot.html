@@ -1,0 +1,193 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>月貓塔羅牌選牌</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e94560;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        #cardTable {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            max-width: 800px;
+            margin-bottom: 1rem;
+        }
+
+        .card {
+            width: 60px;
+            height: 100px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="100" viewBox="0 0 60 100"><rect width="60" height="100" fill="%232c3e50"/><circle cx="30" cy="50" r="20" fill="none" stroke="%23ecf0f1" stroke-width="2"/><path d="M30 30 L30 70 M10 50 L50 50" stroke="%23ecf0f1" stroke-width="2"/></svg>') center/cover;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+            }
+
+        #selectedCard {
+            width: 180px;
+            height: 300px;
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            color: #ecf0f1;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            margin-bottom: 1rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #cardDescription {
+            font-size: 1rem;
+            max-width: 300px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #returnButton {
+            background: #e94560;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            opacity: 0;
+        }
+
+            #returnButton:hover {
+                background: #ff6b6b;
+                transform: translateY(-2px);
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="45" fill="#2c3e50" />
+            <path d="M50 5 A45 45 0 0 1 95 50 A45 45 0 0 1 50 95 A45 45 0 0 1 5 50 A45 45 0 0 1 50 5 Z M50 15 A35 35 0 0 0 15 50 A35 35 0 0 0 50 85 A35 35 0 0 0 85 50 A35 35 0 0 0 50 15 Z" fill="#e94560" />
+            <path d="M65 40 Q80 55 65 70 Q70 55 65 40 Z" fill="#ecf0f1" />
+            <circle cx="40" cy="40" r="5" fill="#ecf0f1" />
+            <circle cx="60" cy="40" r="5" fill="#ecf0f1" />
+            <path d="M35 55 Q50 65 65 55" fill="none" stroke="#ecf0f1" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        <h1>月貓塔羅牌選牌</h1>
+        <div id="cardTable"></div>
+        <div id="selectedCard"></div>
+        <div id="cardDescription"></div>
+        <button id="returnButton">重新選牌</button>
+    </div>
+
+    <script>
+        const tarotCards = [
+            { name: "愚者", description: "新的開始、冒險、無憂無慮" },
+            { name: "魔術師", description: "創造力、技能、意志力" },
+            { name: "女祭司", description: "直覺、神秘、內在知識" },
+            { name: "女皇", description: "豐饒、母性、自然" },
+            { name: "皇帝", description: "權威、結構、控制" },
+            { name: "教皇", description: "傳統、精神指導、信仰" },
+            { name: "戀人", description: "愛情、和諧、選擇" },
+            { name: "戰車", description: "意志力、決心、勝利" },
+            { name: "力量", description: "勇氣、自信、內在力量" },
+            { name: "隱士", description: "內省、孤獨、智慧" },
+            { name: "命運之輪", description: "命運、轉變、機會" },
+            { name: "正義", description: "公平、真理、因果" },
+            { name: "倒吊人", description: "犧牲、新視角、放下" },
+            { name: "死神", description: "結束、變化、轉變" },
+            { name: "節制", description: "平衡、適度、和諧" },
+            { name: "惡魔", description: "誘惑、執著、物質主義" },
+            { name: "高塔", description: "突變、混亂、啟示" },
+            { name: "星星", description: "希望、靈感、寧靜" },
+            { name: "月亮", description: "幻想、恐懼、潛意識" },
+            { name: "太陽", description: "快樂、活力、成功" },
+            { name: "審判", description: "重生、內在呼喚、覺醒" },
+            { name: "世界", description: "完成、整合、成就" }
+        ];
+
+        const cardTable = document.getElementById('cardTable');
+        const selectedCard = document.getElementById('selectedCard');
+        const cardDescription = document.getElementById('cardDescription');
+        const returnButton = document.getElementById('returnButton');
+
+        function shuffleCards() {
+            return [...tarotCards].sort(() => Math.random() - 0.5);
+        }
+
+        function createCardTable() {
+            cardTable.innerHTML = '';
+            const shuffledCards = shuffleCards();
+            shuffledCards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'card';
+                cardElement.addEventListener('click', () => selectCard(card, index));
+                cardTable.appendChild(cardElement);
+            });
+        }
+
+        function selectCard(card, index) {
+            cardTable.style.display = 'none';
+            selectedCard.textContent = card.name;
+            selectedCard.style.opacity = '1';
+            cardDescription.textContent = card.description;
+            cardDescription.style.opacity = '1';
+            returnButton.style.opacity = '1';
+        }
+
+        function resetSelection() {
+            cardTable.style.display = 'flex';
+            selectedCard.style.opacity = '0';
+            cardDescription.style.opacity = '0';
+            returnButton.style.opacity = '0';
+            createCardTable();
+        }
+
+        returnButton.addEventListener('click', resetSelection);
+
+        // 初始化卡桌
+        createCardTable();
+    </script>
+</body>
+</html>
