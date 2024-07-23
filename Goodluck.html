@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>沒有實力 全是運氣</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 1rem;
+        }
+
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #result {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .dice-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .dice {
+            width: 60px;
+            height: 60px;
+            margin: 0 10px;
+            transition: transform 0.5s ease-out;
+        }
+
+        .rolling {
+            animation: roll 0.5s linear infinite;
+        }
+
+        @keyframes roll {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<!-- 引入Bootstrap JavaScript和相依的Popper.js -->
+<body>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <div class="container">
+        <svg class="logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <!-- 背景 -->
+            <rect width="200" height="200" fill="#87CEEB" />
+
+            <!-- 太陽 -->
+            <circle cx="50" cy="50" r="30" fill="#FFD700" />
+
+            <!-- 雲朵 -->
+            <path d="M100 40 Q120 20, 140 40 T180 40 Q200 40, 190 60 T180 80 Q160 85, 140 80 T100 80 Q80 80, 90 60 T100 40" fill="#FFFFFF" />
+
+            <!-- 骰子 -->
+            <rect x="70" y="100" width="80" height="80" rx="10" fill="#FFFFFF" stroke="#000000" stroke-width="3" />
+
+            <!-- 骰子點數 -->
+            <circle cx="90" cy="120" r="5" fill="#000000" />
+            <circle cx="110" cy="140" r="5" fill="#000000" />
+            <circle cx="130" cy="160" r="5" fill="#000000" />
+        </svg>
+        <h1>運氣遊戲 全吃人品</h1>
+        <h5><a href="Reasonable.html">點我 去拯救兄弟[開車撞到人了..]</a></h5>
+        <button onclick="rollDice()" id="rollButton">擲骰子</button>
+        <div class="dice-container">
+            <svg id="dice1" class="dice" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <rect x="5" y="5" width="90" height="90" rx="10" fill="#fff" stroke="#000" stroke-width="5" />
+            </svg>
+            <svg id="dice2" class="dice" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <rect x="5" y="5" width="90" height="90" rx="10" fill="#fff" stroke="#000" stroke-width="5" />
+            </svg>
+        </div>
+        <p id="result"></p>
+    </div>
+
+
+    <script>
+        // JavaScript 代碼保持不變
+        function createDiceSVG(value, svgId) {
+            const svg = document.getElementById(svgId);
+            svg.innerHTML = `<rect x="5" y="5" width="90" height="90" rx="10" fill="#fff" stroke="#000" stroke-width="5"/>`;
+
+            const dotPositions = {
+                1: [[50, 50]],
+                2: [[25, 25], [75, 75]],
+                3: [[25, 25], [50, 50], [75, 75]],
+                4: [[25, 25], [25, 75], [75, 25], [75, 75]],
+                5: [[25, 25], [25, 75], [50, 50], [75, 25], [75, 75]],
+                6: [[25, 25], [25, 50], [25, 75], [75, 25], [75, 50], [75, 75]]
+            };
+
+            dotPositions[value].forEach(([cx, cy]) => {
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", cx);
+                circle.setAttribute("cy", cy);
+                circle.setAttribute("r", "5");
+                circle.setAttribute("fill", "#000");
+                svg.appendChild(circle);
+            });
+        }
+
+        function rollDice() {
+            const dice1 = document.getElementById("dice1");
+            const dice2 = document.getElementById("dice2");
+            const resultElement = document.getElementById("result");
+            const rollButton = document.getElementById("rollButton");
+
+            rollButton.disabled = true;
+            dice1.classList.add("rolling");
+            dice2.classList.add("rolling");
+            resultElement.innerHTML = "命運齒輪正在轉動...";
+
+            setTimeout(() => {
+                dice1.classList.remove("rolling");
+                dice2.classList.remove("rolling");
+
+                const diceValue1 = Math.floor(Math.random() * 6) + 1;
+                const diceValue2 = Math.floor(Math.random() * 6) + 1;
+                const total = diceValue1 + diceValue2;
+                const gate = Math.floor(Math.random() * 12) + 1;
+
+                createDiceSVG(diceValue1, "dice1");
+                createDiceSVG(diceValue2, "dice2");
+
+                let resultText = `你擲出了[ ${diceValue1} 點]和 [ ${diceValue2} 點]，總和為[ ${total} 點]。<br>`;
+                resultText += `本次事件成功門檻需要 [ ${gate} 點]。<br>`;
+
+                if (total >= gate) {
+                    resultText += '<span style="color: green;">恭喜你歐氣爆棚</span>';
+                } else {
+                    resultText += '<span style="color: red;">兄弟 勸你明天再想吧。</span> </br> <div> <a href = "Tarot.html">點我 算塔羅改運</a></div>';
+                }
+
+                resultElement.innerHTML = resultText;
+                rollButton.disabled = false;
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
