@@ -1,0 +1,245 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>晚餐決策轉盤</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js" defer></script>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        canvas {
+            width: 100%;
+            height: auto;
+        }
+
+        #spin {
+            margin-top: 20px;
+            padding: 12px 24px;
+            font-size: 18px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            #spin:hover {
+                background-color: #357abd;
+            }
+
+        #pointer {
+            position: absolute;
+            top: 50%;
+            left: 100%; /* 指標在轉盤的正右方 */
+            margin-left: 10px; /* 讓指標稍微遠離轉盤 */
+            width: 30px;
+            height: 30px;
+            background-color: #e74c3c;
+            clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+            transform: translateY(-40px); /* 垂直居中 */
+        }
+
+        #result-card {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background-color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-out;
+            z-index: 10;
+            font-size: 24px;
+            color: #2c3e50;
+        }
+
+            #result-card.show {
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        #new-option {
+            margin-top: 20px;
+            width: calc(100% - 24px);
+            padding: 12px;
+            font-size: 16px;
+        }
+
+        #add-option {
+            margin-top: 10px;
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            #add-option:hover {
+                background-color: #357abd;
+            }
+
+        #options-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+            #options-list li {
+                margin: 5px 0;
+                font-size: 18px;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>今晚吃</h1><button id="spin">?</button>
+        <div id="pointer"></div>
+        <canvas id="wheel" width="400" height="400"></canvas>
+        <br>
+        <input type="text" id="new-option" placeholder="新增選項">
+        <button id="add-option">新增選項</button>
+        <ul id="options-list"></ul>
+        <br>
+        <div id="result-card"></div>
+        <div> <a href="index.html">點我回家</a></div>
+    </div>
+    <script>
+        const canvas = document.getElementById('wheel');
+        const ctx = canvas.getContext('2d');
+        const spinButton = document.getElementById('spin');
+        const resultCard = document.getElementById('result-card');
+        const addOptionButton = document.getElementById('add-option');
+        const newOptionInput = document.getElementById('new-option');
+        const optionsList = document.getElementById('options-list');
+
+        let meals = ['小七', '全家', 'Subway', 'Sukiya', '麥當勞', '摩斯', '健康餐', '便當'];
+        const colors = ['#fbf8cc', '#fde4cf', '#ffcfd2', '#f1c0e8', '#cfbaf0', '#a3c4f3', '#90dbf4', '#8eecf5', '#98f5e1', '#b9fbc0'];
+        let totalSegments = meals.length;
+        let arcSize = (2 * Math.PI) / totalSegments;
+        let currentRotation = 0;
+        let isSpinning = false;
+
+        function drawWheel() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate(currentRotation);
+
+            for (let i = 0; i < totalSegments; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, canvas.width / 2, i * arcSize, (i + 1) * arcSize);
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.fill();
+                ctx.save();
+                ctx.rotate(i * arcSize + arcSize / 2);
+                ctx.fillStyle = '#333';
+                ctx.font = 'bold 16px Helvetica Neue';
+                ctx.fillText(meals[i], 70, 5);
+                ctx.restore();
+            }
+
+            ctx.restore();
+        }
+
+        function spin() {
+            if (isSpinning) return;
+            isSpinning = true;
+            resultCard.classList.remove('show');
+            const spinDuration = 5000;
+            const startTime = Date.now();
+            const startAngle = currentRotation;
+            const totalRotation = 360 * 5 + Math.random() * 360;
+
+            function animate() {
+                const now = Date.now();
+                const elapsed = now - startTime;
+                if (elapsed < spinDuration) {
+                    const t = elapsed / spinDuration;
+                    const easedT = 1 - Math.pow(1 - t, 4);
+                    currentRotation = startAngle + (totalRotation * Math.PI / 180) * easedT;
+                    drawWheel();
+                    requestAnimationFrame(animate);
+                } else {
+                    currentRotation = startAngle + (totalRotation * Math.PI / 180);
+                    drawWheel();
+                    isSpinning = false;
+                    showResult();
+                }
+            }
+
+            animate();
+        }
+
+        function showResult() {
+            const normalizedRotation = (currentRotation % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+            const winningSegment = Math.floor((2 * Math.PI - normalizedRotation) / arcSize) % totalSegments;
+            const winner = meals[winningSegment];
+
+            resultCard.textContent = `今晚吃 ${winner}!`;
+            setTimeout(() => {
+                resultCard.classList.add('show');
+                setTimeout(() => {
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
+                }, 300);
+            }, 1000);
+        }
+
+        function addOption() {
+            const newOption = newOptionInput.value.trim();
+            if (newOption) {
+                meals.push(newOption);
+                totalSegments = meals.length;
+                arcSize = (2 * Math.PI) / totalSegments;
+                const li = document.createElement('li');
+                li.textContent = newOption;
+                optionsList.appendChild(li);
+                drawWheel();
+                newOptionInput.value = '';
+            }
+        }
+
+        addOptionButton.addEventListener('click', addOption);
+        newOptionInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                addOption();
+            }
+        });
+
+        spinButton.addEventListener('click', spin);
+        drawWheel();
+    </script>
+</body>
+</html>
